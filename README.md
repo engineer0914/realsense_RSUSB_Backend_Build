@@ -115,3 +115,20 @@ ros2 run rqt_image_view rqt_image_view
 ```
 
 *(rqt 화면 좌측 상단 드롭다운에서 `/camera/camera/color/image_raw`를 선택하면 컬러 화면을 볼 수 있습니다.)*
+
+
+### imu 제한
+
+```bash
+ros2 launch realsense2_camera rs_launch.py enable_gyro:=false enable_accel:=false
+```
+
+
+### imu 부분 활성화
+```bash
+ros2 launch realsense2_camera rs_launch.py gyro_fps:=200 accel_fps:=63 unite_imu_method:=2
+```
+
+
+
+
