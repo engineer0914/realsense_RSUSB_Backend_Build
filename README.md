@@ -27,21 +27,29 @@ sudo apt install -y git libssl-dev libusb-1.0-0-dev libudev-dev pkg-config cmake
 
 인텔 리얼센스 공식 SDK를 다운로드하고, RSUSB 옵션을 켜서 빌드합니다.
 
-```bash
+```
 cd ~
 git clone https://github.com/IntelRealSense/librealsense.git
 cd librealsense
 
 # 빌드 디렉토리 생성
 mkdir build && cd build
+```
 
+```
 # RSUSB 백엔드 강제 활성화 설정으로 CMake 실행
-cmake ../ -DFORCE_RSUSB_BACKEND=ON -DCMAKE_BUILD_TYPE=Release -DBUILD_EXAMPLES=false -DBUILD_GRAPHICAL_EXAMPLES=false
+cmake ../ \
+  -DFORCE_RSUSB_BACKEND=ON \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DBUILD_EXAMPLES=true \
+  -DBUILD_GRAPHICAL_EXAMPLES=true
+```
 
+```
 # 컴파일 및 설치 (코어 수에 맞춰 병렬 빌드)
 make -j$(nproc)
 sudo make install
-
+sudo ldconfig
 ```
 
 ## 3. Udev 권한 설정 및 하드웨어 인식 테스트
@@ -66,6 +74,12 @@ rs-enumerate-devices -c
 
 *성공 시 카메라의 Extrinsic Parameter(자이로, 뎁스, 컬러 등의 캘리브레이션 데이터)가 출력됩니다.*
 
+## 중간 점검차 확인
+```
+which realsense-viewer
+realsense-viewer
+```
+
 ## 4. ROS 2 realsense-ros 래퍼 빌드
 
 ROS 2와 카메라를 연결해 주는 노드 패키지를 워크스페이스에 다운로드하고 빌드합니다. 이미 소스로 설치한 `librealsense2`를 `rosdep`이 덮어쓰지 못하도록 예외 처리하는 것이 핵심입니다.
@@ -74,16 +88,24 @@ ROS 2와 카메라를 연결해 주는 노드 패키지를 워크스페이스에
 # 워크스페이스 및 src 폴더 생성
 mkdir -p ~/ros2_ws/src
 cd ~/ros2_ws/src
+sudo rosdep init
+rosdep update
+```
 
+```
 # ROS 2 래퍼 소스 코드 다운로드
 git clone -b ros2-development https://github.com/IntelRealSense/realsense-ros.git
+```
 
+```
 # 워크스페이스 루트로 이동
 cd ~/ros2_ws
 
 # 의존성 설치 (소스 빌드한 SDK 제외)
 rosdep install -i --from-path src --rosdistro humble --skip-keys=librealsense2 -y
+```
 
+```
 # 전체 패키지 빌드
 colcon build
 
